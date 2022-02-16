@@ -3,9 +3,12 @@
 #    python-tkdnd
 #    ttkwidgets
 #    opencv-python
-#    openc-contrib-python
+#    opencv-contrib-python
 #    auto-py-to-exe
 
+import threading
+import time
+import os.path
 import sys
 import os
 import tkinter      as tk
@@ -13,6 +16,7 @@ import tkinter.font as tkFont
 import tkinterDnD
 import cv2
 import time
+
 from cv2     import dnn_superres
 from tkinter import ttk
 from tkinter import *
@@ -23,51 +27,56 @@ from timeit  import default_timer as timer
 from ctypes import windll 
 windll.shcore.SetProcessDpiAwareness(1) 
 
-version     = "0.9.7"
+version     = "0.9.9.3"
 author      = "Annunziata Gianluca"
 image_path  = "no file"
 AI_model    = "no model"
-upscale_factor     = 4
+upscale_factor     = 2
 resize_input_image = 1
+supported_file_list = [ '.jpg' , '.jpeg',
+                        '.png' , '.PNG' ,
+                        '.webp', 
+                        '.bmp' , 
+                        '.tif' , '.tiff']
 
 # ----------- Dimensions -----------
 
-window_width       = 1400
-window_height      = 800
+window_width       = 1300
+window_height      = 725
 left_bar_width     = 400
 left_bar_height    = window_height
-drag_drop_width    = 1000
+drag_drop_width    = 900
 drag_drop_height   = window_height
 button_width       = 275
 button_height      = 35
-show_image_width   = 800
-show_image_height  = 650
+show_image_width   = 700
+show_image_height  = 600
 image_text_width   = drag_drop_width * 0.85
-image_text_height  = 38
+image_text_height  = 35
+
+button_1_y = 215
+button_2_y = 300
+button_3_y = 380
+button_4_y = 460
+
+label_1_y = 255
+label_2_y = 340
+label_3_y = 420
+label_4_y = 500
 
 # ----------- /Dimensions -----------
 
 # ----------- Functions -----------
 
 def find_file_production_and_dev(relative_path):
-    # Get absolute path to resource, works for dev and for PyInstaller "
     base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
 
 def count_dropped_images(event):
-    count_png  = 0
-    count_PNG  = 0
-    count_jpg  = 0
-    count_jpeg = 0
-    count_webp = 0
-
-    count_png = str(event.data).count('.png') 
-    count_PNG = str(event.data).count('.PNG') 
-    count_jpg = str(event.data).count('.jpg')
-    count_jpeg = str(event.data).count('.jpeg')
-    count_webp = str(event.data).count('.webp')
-
-    return count_png + count_PNG + count_jpg + count_jpeg + count_webp
+    file_count = 0
+    for file_type in supported_file_list:
+        file_count = file_count +  str(event.data).count(file_type)
+    return file_count
 
 def function_drop(event):
     global image_path
@@ -114,23 +123,27 @@ def AI_upscale(image_path, AI_model):
     super_res           = dnn_superres.DnnSuperResImpl_create()
     upscaled_image_path = image_path.replace(".PNG","").replace(".png","") + "_" + AI_model + "_x" + str(upscale_factor) + ".png"
     
-    start     = timer()
     super_res.readModel(path_model)
-    
     #super_res.setPreferableBackend(cv2.dnn.DNN_BACKEND_DEFAULT)
     #super_res.setPreferableTarget(cv2.dnn.DNN_TARGET_OPENCL_FP16)
-    
     super_res.setModel(model_name, upscale_factor)
     result    = super_res.upsample(cv2.imread(image_path))
-    end       = timer()
-    
     cv2.imwrite(upscaled_image_path, result)
 
-    return upscaled_image_path, end - start
-    
+    return
+
+def wait_for_file(image_path, _ ):
+    start     = timer()
+    while not os.path.exists(image_path):
+        time.sleep(3)
+
+    if os.path.isfile(image_path):
+        end       = timer()
+        comp_time = end - start
+        info_string.set("Done!  " + str(round(comp_time)) + " sec.")
+
 def upscale_command():
     global image_path
-    info_string.set("")
 
     if "no file" in image_path:
         info_string.set("No image selected")
@@ -138,16 +151,23 @@ def upscale_command():
     if "no model" in AI_model:
         info_string.set("No model selected")
         return
+
+    info_string.set("Upscaling...")
+    thread_upscale = threading.Thread(target=AI_upscale, args=(image_path, AI_model), daemon=True)
+    thread_upscale.start()
+
+    upscaled_image_path = image_path.replace(".PNG","").replace(".png","") + "_" + AI_model + "_x" + str(upscale_factor) + ".png"
+    thread_wait_image = threading.Thread(target=wait_for_file, args=(upscaled_image_path, 0), daemon=True)
+    thread_wait_image.start()
     
-    upscaled_image_path, comp_time = AI_upscale(image_path, AI_model)
-    info_string.set("Done!  " + str(round(comp_time)) + " sec.")
-    show_image_in_GUI(upscaled_image_path)
-    image_path = "no file"
+def prepare_image(image_to_prepare):
+    new_image_path = image_to_prepare
+    for file_type in supported_file_list:
+        new_image_path = new_image_path.replace(file_type,".png")
+    new_image_path = new_image_path.replace("{", "").replace("}", "").replace(".png", "_resized.png")
     
-def prepare_image(image_to_modify):
-    new_image_path = image_to_modify.replace("{", "").replace("}", "").replace(".PNG",".png").replace(".jpg",".png").replace(".jpeg",".png").replace(".webp",".png").replace(".png", "_resized.png")
     if resize_input_image > 1:
-        old_image      = cv2.imread(image_to_modify.replace("{", "").replace("}", ""))
+        old_image      = cv2.imread(image_to_prepare.replace("{", "").replace("}", ""))
         new_width      = round(old_image.shape[1]/resize_input_image)
         new_height     = round(old_image.shape[0]/resize_input_image)
         resized_image  = cv2.resize(old_image,
@@ -156,7 +176,7 @@ def prepare_image(image_to_modify):
         cv2.imwrite(new_image_path, resized_image)
         return new_image_path
     else:
-        old_image      = cv2.imread(image_to_modify.replace("{", "").replace("}", ""))
+        old_image      = cv2.imread(image_to_prepare.replace("{", "").replace("}", ""))
         cv2.imwrite(new_image_path.replace("_resized.png", ".png"), old_image)
         return new_image_path.replace("_resized.png", ".png")
            
@@ -168,9 +188,12 @@ def place_EDSR_button(root, background_color, text_color):
     EDSR_button["font"]    = ft
     EDSR_button["fg"]      = text_color
     EDSR_button["justify"] = "left"
-    EDSR_button["text"]    = " EDSR"
+    EDSR_button["text"]    = "  EDSR"
     EDSR_button["relief"]  = "flat"
-    EDSR_button.place(x=left_bar_width/2 - button_width/2,y=215,width=button_width,height=button_height)
+    EDSR_button.place(x = left_bar_width/2 - button_width/2, 
+                      y = button_4_y,
+                      width  = button_width,
+                      height = button_height)
     EDSR_button["command"] = lambda input = "EDSR" : choose_model_EDSR(input)
     
 def place_ESPCN_button(root, background_color, text_color):
@@ -181,9 +204,12 @@ def place_ESPCN_button(root, background_color, text_color):
     ESPCN_button["font"]    = ft
     ESPCN_button["fg"]      = text_color
     ESPCN_button["justify"] = "left"
-    ESPCN_button["text"]    = " ESPCN"
+    ESPCN_button["text"]    = "  ESPCN"
     ESPCN_button["relief"]  = "flat"
-    ESPCN_button.place(x=left_bar_width/2 - button_width/2 ,y=295,width=button_width,height=button_height)
+    ESPCN_button.place(x = left_bar_width/2 - button_width/2 ,
+                       y = button_2_y,
+                       width  = button_width,
+                       height = button_height)
     ESPCN_button["command"] = lambda input = "ESPCN" : choose_model_ESPCN(input)
     
 def place_FSRCNN_button(root, background_color, text_color):
@@ -194,9 +220,12 @@ def place_FSRCNN_button(root, background_color, text_color):
     FSRCNN_button["font"]    = ft
     FSRCNN_button["fg"]      = text_color
     FSRCNN_button["justify"] = "left"
-    FSRCNN_button["text"]    = " FSRCNN"
+    FSRCNN_button["text"]    = "  FSRCNN"
     FSRCNN_button["relief"]  = "flat"
-    FSRCNN_button.place(x=left_bar_width/2 - button_width/2,y=375,width=button_width,height=button_height)
+    FSRCNN_button.place(x = left_bar_width/2 - button_width/2,
+                        y = button_1_y,
+                        width  = button_width,
+                        height = button_height)
     FSRCNN_button["command"] = lambda input = "FSRCNN" : choose_model_FSRCNN(input)
     
 def place_LapSRN_button(root, background_color, text_color):
@@ -207,9 +236,12 @@ def place_LapSRN_button(root, background_color, text_color):
     LapSRN_button["font"]    = ft
     LapSRN_button["fg"]      = text_color
     LapSRN_button["justify"] = "left"
-    LapSRN_button["text"]    = " LapSRN"
+    LapSRN_button["text"]    = "  LapSRN"
     LapSRN_button["relief"]  = "flat"
-    LapSRN_button.place(x=left_bar_width/2 - button_width/2,y=455,width=button_width,height=button_height)
+    LapSRN_button.place(x = left_bar_width/2 - button_width/2,
+                        y = button_3_y,
+                        width  = button_width,
+                        height = button_height)
     LapSRN_button["command"] = lambda input = "LapSRN" : choose_model_LapSRN(input)
     
 def choose_model_EDSR(choosed_model):
@@ -272,7 +304,7 @@ def choose_model_LapSRN(choosed_model):
 
 class App:
     def __init__(self, root):
-        root.title("NiceScale " + version + " | Copyright© Gianluca Annunziata")
+        root.title("NiceScale " + version) # + " | Copyright© Gianluca Annunziata")
         width = window_width
         height = window_height
         screenwidth = root.winfo_screenwidth()
@@ -280,9 +312,11 @@ class App:
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
+        logo = PhotoImage(file=find_file_production_and_dev("logo4.png"))
+        root.iconphoto(False, logo)
         
         # BIG BLACK BAR
-        ft = tkFont.Font(family='Verdana',size=13)
+        ft = tkFont.Font(family='Verdana',size=14)
 
         Left_container            = tk.Label(root)
         Left_container["anchor"]  = "e"
@@ -302,7 +336,10 @@ class App:
         Title["fg"]      = "#1e9fff"
         Title["justify"] = "center"
         Title["text"]    = "NiceScaler " + version
-        Title.place(x=0,y=10,width=400,height=62)
+        Title.place(x = 0,
+                    y = 10,
+                    width  = left_bar_width,
+                    height = 62)
         
         ft = tkFont.Font(family='Verdana',size=9)
         Under_title            = tk.Label(root)
@@ -310,8 +347,11 @@ class App:
         Under_title["font"]    = ft
         Under_title["fg"]      = "#d3d3d3"
         Under_title["justify"] = "center"
-        Under_title["text"]    = "upscale x4 every photo you want"
-        Under_title.place(x=0,y=55,width=400,height=42)
+        Under_title["text"]    = "upscale x2 every photo you want"
+        Under_title.place(x = 0,
+                          y = 55,
+                          width  = left_bar_width,
+                          height = 42)
 
         # SECTION TO CHOOSE MODEL
         IA_selection_borders            = tk.Label(root)
@@ -320,10 +360,10 @@ class App:
         IA_selection_borders["justify"] = "center"
         IA_selection_borders["text"]    = ""
         IA_selection_borders["relief"]  = "groove"
-        IA_selection_borders.place(x      = left_bar_width/2 - 340/2,
+        IA_selection_borders.place(x      = left_bar_width/2 - 350/2,
                                    y      = 130,
-                                   width  = 340,
-                                   height = 440)
+                                   width  = 350,
+                                   height = 442)
         
         ft                            = tkFont.Font(family='Verdana',size=11)        
         IA_selection_title            = tk.Label(root)
@@ -334,6 +374,7 @@ class App:
         IA_selection_title["text"]    = "Select IA model"
         IA_selection_title.place(x=0,y=150,width=398,height=44)
 
+        # buttons
         default_button_color  = "#484848"
         default_text_color    = "#f2f2f2"
         selected_button_color = "white"
@@ -345,44 +386,56 @@ class App:
         place_LapSRN_button(root, default_button_color, default_text_color)    
 
         # LABELS
-        ft                   = tkFont.Font(family='Verdana',size=8)
+        ft                   = tkFont.Font(family='Verdana',size=9)
         
         EDSR_label           = tk.Label(root)
         EDSR_label["bg"]     = "#000000"
         EDSR_label["font"]   = ft
-        EDSR_label["fg"]     = "#ababab"
+        EDSR_label["fg"]     = "#FF4433"
         EDSR_label["anchor"] = "w"
-        EDSR_label["text"]   = "Accuracy 76% / Really Slow"
-        EDSR_label.place(x=80,y=252,width=button_width,height=30)
+        EDSR_label["text"]   = "Accuracy 88.5% / really slow"
+        EDSR_label.place(x = 85,
+                         y = label_4_y,
+                         width  = button_width,
+                         height = 30)
     
         ESPCN_label           = tk.Label(root)
         ESPCN_label["bg"]     = "#000000"
         ESPCN_label["font"]   = ft
         ESPCN_label["fg"]     = "#ababab"
         ESPCN_label["anchor"] = "w"
-        ESPCN_label["text"]   = "Accuracy 73% / Really Fast"
-        ESPCN_label.place(x=80,y=332,width=button_width,height=30)
+        ESPCN_label["text"]   = "Accuracy 87.7% / really fast"
+        ESPCN_label.place(x = 85, 
+                          y = label_2_y,
+                          width  = button_width,
+                          height = 30)
         
         FSRCNN_label           = tk.Label(root)
         FSRCNN_label["bg"]     = "#000000"
         FSRCNN_label["font"]   = ft
-        FSRCNN_label["fg"]     = "#ababab"
+        FSRCNN_label["fg"]     = "#50C878"
         FSRCNN_label["anchor"] = "w"
-        FSRCNN_label["text"]   = "Accuracy 73% / Really Fast"
-        FSRCNN_label.place(x=80,y=412,width=button_width,height=30)
+        FSRCNN_label["text"]   = "Accuracy 87.6% / really fast"
+        FSRCNN_label.place(x = 85,
+                           y = label_1_y,
+                           width  = button_width,
+                           height = 30)
 
         LapSRN_label           = tk.Label(root)
         LapSRN_label["bg"]     = "#000000"
         LapSRN_label["font"]   = ft
         LapSRN_label["fg"]     = "#ababab"
         LapSRN_label["anchor"] = "w"
-        LapSRN_label["text"]   = "Accuracy 73% / Medium speed"
-        LapSRN_label.place(x=80,y=492,width=button_width,height=30)
+        LapSRN_label["text"]   = "Accuracy 87.4% / slow"
+        LapSRN_label.place(x = 85,
+                           y = label_3_y,
+                           width  = button_width,
+                           height = 30)
         
-        # ERROR MESSAGE
+        # MESSAGE
         info_string.set("")
         error_message_label = ttk.Label(root,
-                              font       = ("Verdana", 10),
+                              font       = ("Verdana", 9),
                               textvar    = info_string,
                               relief     = "flat",
                               justify    = "center",
@@ -390,7 +443,7 @@ class App:
                               foreground = "#ffbf00",
                               anchor     = "center")
         error_message_label.place(x      = 0,
-                                  y      = 635,
+                                  y      = 600,
                                   width  = left_bar_width,
                                   height = 30)
         
@@ -401,12 +454,12 @@ class App:
         Upscale_button["font"]    = ft
         Upscale_button["fg"]      = "#000000"
         Upscale_button["justify"] = "center"
-        Upscale_button["text"]    = "Upscale x4"
+        Upscale_button["text"]    = "Upscale x2"
         Upscale_button["relief"]  = "flat"
-        Upscale_button.place(x      = left_bar_width/2 - 350/2,
-                             y      = 700,
-                             width  = 350,
-                             height = 65)
+        Upscale_button.place(x      = left_bar_width/2 - button_width/2,
+                             y      = left_bar_height - 50 - 50/2,
+                             width  = button_width,
+                             height = 50)
         Upscale_button["command"] = lambda : upscale_command()
 
         # DRAG & DROP WIDGET
@@ -433,7 +486,6 @@ class App:
                         y = drag_drop_height - image_text_height - 25,
                         width  = image_text_width,
                         height = image_text_height)
-
 
 if __name__ == "__main__":
     root              = tkinterDnD.Tk()
