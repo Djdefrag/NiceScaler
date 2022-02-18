@@ -1,11 +1,4 @@
-# libraries to build project:
-#    tk-tools
-#    python-tkdnd
-#    ttkwidgets
-#    opencv-python
-#    opencv-contrib-python
-#    auto-py-to-exe
-
+from cgitb import text
 import threading
 import time
 import os.path
@@ -16,7 +9,6 @@ import tkinter.font as tkFont
 import tkinterDnD
 import cv2
 import time
-
 from cv2     import dnn_superres
 from tkinter import ttk
 from tkinter import *
@@ -27,12 +19,13 @@ from timeit  import default_timer as timer
 from ctypes import windll 
 windll.shcore.SetProcessDpiAwareness(1) 
 
-version     = "0.9.9.3"
+version     = "1.0"
 author      = "Annunziata Gianluca"
 image_path  = "no file"
 AI_model    = "no model"
-upscale_factor     = 2
-resize_input_image = 1
+show_filename_label  = 0
+upscale_factor       = 2
+resize_input_image   = 1
 supported_file_list = [ '.jpg' , '.jpeg',
                         '.png' , '.PNG' ,
                         '.webp', 
@@ -47,12 +40,12 @@ left_bar_width     = 400
 left_bar_height    = window_height
 drag_drop_width    = 900
 drag_drop_height   = window_height
-button_width       = 275
+button_width       = 280
 button_height      = 35
 show_image_width   = 700
-show_image_height  = 600
-image_text_width   = drag_drop_width * 0.85
-image_text_height  = 35
+show_image_height  = 590
+image_text_width   = drag_drop_width * 0.90
+image_text_height  = 38
 
 button_1_y = 215
 button_2_y = 300
@@ -87,6 +80,7 @@ def function_drop(event):
     elif number_images == 1:
         image_path = prepare_image(str(event.data[:]))
         show_image_in_GUI(image_path)
+        place_fileName_label(root, image_path)
     else:
         info_string.set("Only one image supported!")
         return
@@ -102,11 +96,11 @@ def show_image_in_GUI(image_to_show):
     img_label["bg"]      = "black"
     img_label["relief"]  = "flat"
     img_label.place(x      = left_bar_width + drag_drop_width/2 - show_image_width/2,
-                    y      = drag_drop_height/2 - show_image_height/2 - image_text_height,
+                    y      = drag_drop_height/2 - show_image_height/2 - image_text_height + 5,
                     width  = show_image_width,
                     height = show_image_height)
 
-def AI_upscale(image_path, AI_model):
+def AI_upscale_image(image_path, AI_model):
     if "EDSR" in AI_model:
         model_name = "edsr"
         path_model = find_file_production_and_dev("EDSR_x" + str(upscale_factor)+".pb")
@@ -135,14 +129,14 @@ def AI_upscale(image_path, AI_model):
 def wait_for_file(image_path, _ ):
     start     = timer()
     while not os.path.exists(image_path):
-        time.sleep(3)
+        time.sleep(1)
 
     if os.path.isfile(image_path):
         end       = timer()
         comp_time = end - start
         info_string.set("Done!  " + str(round(comp_time)) + " sec.")
 
-def upscale_command():
+def upscale_button_command():
     global image_path
 
     if "no file" in image_path:
@@ -153,7 +147,7 @@ def upscale_command():
         return
 
     info_string.set("Upscaling...")
-    thread_upscale = threading.Thread(target=AI_upscale, args=(image_path, AI_model), daemon=True)
+    thread_upscale = threading.Thread(target=AI_upscale_image, args=(image_path, AI_model), daemon=True)
     thread_upscale.start()
 
     upscaled_image_path = image_path.replace(".PNG","").replace(".png","") + "_" + AI_model + "_x" + str(upscale_factor) + ".png"
@@ -243,7 +237,34 @@ def place_LapSRN_button(root, background_color, text_color):
                         width  = button_width,
                         height = button_height)
     LapSRN_button["command"] = lambda input = "LapSRN" : choose_model_LapSRN(input)
-    
+
+def place_fileName_label(root, image_path):
+    global show_filename_label
+    show_filename_label = show_filename_label + 1
+
+    if show_filename_label == 1:
+        img      = cv2.imread(image_path.replace("{", "").replace("}", ""))
+        width      = round(img.shape[1])
+        height     = round(img.shape[0])
+        file_name_string.set(image_path + " | " + str(width) + "x" + str(height))
+        drag_drop = ttk.Label(root,
+                              font = ("Verdana", 9),
+                              textvar    = file_name_string,
+                              relief     = "flat",
+                              justify    = "center",
+                              background = "#E0E0E0",
+                              foreground = "black",
+                              anchor     = "center")
+        drag_drop.place(x = left_bar_width + drag_drop_width/2 - image_text_width/2,
+                        y = drag_drop_height - image_text_height - 30,
+                        width  = image_text_width,
+                        height = image_text_height)
+    else:
+        img      = cv2.imread(image_path.replace("{", "").replace("}", ""))
+        width      = round(img.shape[1])
+        height     = round(img.shape[0])
+        file_name_string.set(image_path + " | " + str(width) + "x" + str(height))
+
 def choose_model_EDSR(choosed_model):
     global AI_model
     AI_model = choosed_model
@@ -305,24 +326,23 @@ def choose_model_LapSRN(choosed_model):
 class App:
     def __init__(self, root):
         root.title("NiceScale " + version) # + " | Copyright© Gianluca Annunziata")
-        width = window_width
-        height = window_height
-        screenwidth = root.winfo_screenwidth()
+        width        = window_width
+        height       = window_height
+        screenwidth  = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
-        alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
+        alignstr     = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
+
         logo = PhotoImage(file=find_file_production_and_dev("logo4.png"))
         root.iconphoto(False, logo)
         
         # BIG BLACK BAR
-        ft = tkFont.Font(family='Verdana',size=14)
 
         Left_container            = tk.Label(root)
         Left_container["anchor"]  = "e"
         Left_container["bg"]      = "#000000"
         Left_container["cursor"]  = "arrow"
-        Left_container["font"]    = ft
         Left_container["fg"]      = "#333333"
         Left_container["justify"] = "center"
         Left_container["text"]    = ""
@@ -330,28 +350,41 @@ class App:
         Left_container.place(x=0,y=0,width = left_bar_width, height = left_bar_height)
         
         # TITLE - VERSION
+        ft = tkFont.Font(family='Verdana',size=13)
         Title            = tk.Label(root)
         Title["bg"]      = "#000000"
         Title["font"]    = ft
         Title["fg"]      = "#1e9fff"
-        Title["justify"] = "center"
+        Title["anchor"]  = "w" 
         Title["text"]    = "NiceScaler " + version
-        Title.place(x = 0,
+        Title.place(x = 88,
                     y = 10,
                     width  = left_bar_width,
-                    height = 62)
+                    height = 60)
         
         ft = tkFont.Font(family='Verdana',size=9)
         Under_title            = tk.Label(root)
         Under_title["bg"]      = "#000000"
         Under_title["font"]    = ft
         Under_title["fg"]      = "#d3d3d3"
-        Under_title["justify"] = "center"
-        Under_title["text"]    = "upscale x2 every photo you want"
-        Under_title.place(x = 0,
-                          y = 55,
+        Under_title["anchor"]  = "w" 
+        Under_title["text"]    = "upscale any photo you wish"
+        Under_title.place(x = 90,
+                          y = 53,
                           width  = left_bar_width,
-                          height = 42)
+                          height = 34)
+
+        global logo_big
+        logo_big = PhotoImage(file=find_file_production_and_dev("logo4_big.png"))
+        logo_label            = tk.Label(root)
+        logo_label['image']   = logo_big
+        logo_label["justify"] = "center"
+        logo_label["bg"]      = "black"
+        logo_label["relief"]  = "flat"
+        logo_label.place(x    = 26,
+                   y      = 31,
+                   width  = 45,
+                   height = 45)
 
         # SECTION TO CHOOSE MODEL
         IA_selection_borders            = tk.Label(root)
@@ -361,18 +394,18 @@ class App:
         IA_selection_borders["text"]    = ""
         IA_selection_borders["relief"]  = "groove"
         IA_selection_borders.place(x      = left_bar_width/2 - 350/2,
-                                   y      = 130,
+                                   y      = 125,
                                    width  = 350,
                                    height = 442)
         
-        ft                            = tkFont.Font(family='Verdana',size=11)        
+        ft                            = tkFont.Font(family='Verdana',size=12)        
         IA_selection_title            = tk.Label(root)
         IA_selection_title["bg"]      = "#010000"
         IA_selection_title["font"]    = ft
         IA_selection_title["fg"]      = "#dcdcdc"
-        IA_selection_title["justify"] = "center"
-        IA_selection_title["text"]    = "Select IA model"
-        IA_selection_title.place(x=0,y=150,width=398,height=44)
+        IA_selection_title["anchor"]  = "w" 
+        IA_selection_title["text"]    = "          Select IA model"
+        IA_selection_title.place(x=0,y=150,width=400,height=40)
 
         # buttons
         default_button_color  = "#484848"
@@ -394,10 +427,10 @@ class App:
         EDSR_label["fg"]     = "#FF4433"
         EDSR_label["anchor"] = "w"
         EDSR_label["text"]   = "Accuracy 88.5% / really slow"
-        EDSR_label.place(x = 85,
+        EDSR_label.place(x = 75,
                          y = label_4_y,
                          width  = button_width,
-                         height = 30)
+                         height = 31)
     
         ESPCN_label           = tk.Label(root)
         ESPCN_label["bg"]     = "#000000"
@@ -405,10 +438,10 @@ class App:
         ESPCN_label["fg"]     = "#ababab"
         ESPCN_label["anchor"] = "w"
         ESPCN_label["text"]   = "Accuracy 87.7% / really fast"
-        ESPCN_label.place(x = 85, 
+        ESPCN_label.place(x = 75, 
                           y = label_2_y,
                           width  = button_width,
-                          height = 30)
+                          height = 31)
         
         FSRCNN_label           = tk.Label(root)
         FSRCNN_label["bg"]     = "#000000"
@@ -416,10 +449,10 @@ class App:
         FSRCNN_label["fg"]     = "#50C878"
         FSRCNN_label["anchor"] = "w"
         FSRCNN_label["text"]   = "Accuracy 87.6% / really fast"
-        FSRCNN_label.place(x = 85,
+        FSRCNN_label.place(x = 75,
                            y = label_1_y,
                            width  = button_width,
-                           height = 30)
+                           height = 31)
 
         LapSRN_label           = tk.Label(root)
         LapSRN_label["bg"]     = "#000000"
@@ -427,10 +460,10 @@ class App:
         LapSRN_label["fg"]     = "#ababab"
         LapSRN_label["anchor"] = "w"
         LapSRN_label["text"]   = "Accuracy 87.4% / slow"
-        LapSRN_label.place(x = 85,
+        LapSRN_label.place(x = 75,
                            y = label_3_y,
                            width  = button_width,
-                           height = 30)
+                           height = 31)
         
         # MESSAGE
         info_string.set("")
@@ -460,36 +493,28 @@ class App:
                              y      = left_bar_height - 50 - 50/2,
                              width  = button_width,
                              height = 50)
-        Upscale_button["command"] = lambda : upscale_command()
+        Upscale_button["command"] = lambda : upscale_button_command()
 
         # DRAG & DROP WIDGET
-        
         drag_drop = ttk.Label(root,
+                              text    = "Drop an image here",
                               ondrop     = function_drop,
+                              font       = ("Verdana", 11),
+                              anchor     = "center",
                               relief     = "solid",
                               justify    = "center",
-                              background = "#E8E8E8",
-                              foreground = "#202020")
+                              background = "#F5F5F5",
+                              foreground = "#505050")
         drag_drop.place(x=400,y=0,width = drag_drop_width, height = drag_drop_height)
-        
-        # FILE NAME
-        file_name_string.set('Drop a photo here!')
-        drag_drop = ttk.Label(root,
-                              font = ("Verdana", 9),
-                              textvar = file_name_string,
-                              relief  = "solid",
-                              justify = "center",
-                              background = "#E8E8E8",
-                              foreground = "#383838",
-                              anchor = "center")
-        drag_drop.place(x = left_bar_width + drag_drop_width/2 - image_text_width/2,
-                        y = drag_drop_height - image_text_height - 25,
-                        width  = image_text_width,
-                        height = image_text_height)
+
+
+
+
+
 
 if __name__ == "__main__":
     root              = tkinterDnD.Tk()
     file_name_string  = tk.StringVar()
-    info_string      = tk.StringVar()
+    info_string       = tk.StringVar()
     app               = App(root)
     root.mainloop()
