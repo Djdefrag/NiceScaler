@@ -1,36 +1,72 @@
-# NiceScale
+# NiceScaler
+
 Lossless image upscaler app based on OpenCV SuperResolution deeplearning models
 
-Credit to.
-OpenCV  (https://opencv.org/)
-EDSR    (https://arxiv.org/pdf/1707.02921.pdf)
-ESPCN   (https://arxiv.org/pdf/1609.05158.pdf)
-FSRCNN  (https://arxiv.org/pdf/1608.00367.pdf)
-LapSRN  (https://arxiv.org/pdf/1710.01992.pdf)
+- Interface.
 
-Installation.
-NiceScaler does not require any installation, it's a single portable exe usable on any Windows PC
+![GISpXg](https://user-images.githubusercontent.com/32263112/155835469-f437d8b6-c549-4fac-965e-974b37792921.png)
 
-Supported IA backends.
-Actually NiceScaler utilize only CPU to upscale to be compatible with any PC, even without powerfull GPU
+- Example. 
 
-Features.
-Different IA models selection
-Drag and drop image 
-Upscaling x2 one image at a time 
-Simple and clean GUI
-Compatible with PNG, JPEG, BMP, WEBP, TIF images
-Portable everywhere without installation
+Original photo
 
-Next steps.
-If the project is well followed, I will update and implement all the following features:
+![rPc+73](https://user-images.githubusercontent.com/32263112/155835499-fef341fb-d727-40f6-841c-5c41a1340499.png)
 
-Batch upscaling (load multiple images)
-Video upscaling
-More AI backends (CUDA / OpenCL / Vulkan)
-GUI-related funcionalities  (Button to stop upscaling, etc.)
-Pre-processing (image/videos downscaling before upscaling)
-Feedback.
-Please, give me feedback about the product, i will listen all feedback.
+
+Upscaled photo
+
+![7E2yE6](https://user-images.githubusercontent.com/32263112/155835502-1347c958-f919-47ac-b1fd-468acdead24b.png)
+
+
+ - Credit to.
+
+    OpenCV  (https://opencv.org/)
+
+    EDSR    (https://arxiv.org/pdf/1707.02921.pdf)
+
+    ESPCN   (https://arxiv.org/pdf/1609.05158.pdf)
+
+    FSRCNN  (https://arxiv.org/pdf/1608.00367.pdf)
+
+    LapSRN  (https://arxiv.org/pdf/1710.01992.pdf)
+
+ - Installation.
+
+    NiceScaler does not require any installation, it's a single portable exe usable on any Windows PC
+
+ - Supported IA backends.
+
+    Actually NiceScaler utilize only CPU to upscale to be compatible with any PC, even without powerfull GPU
+
+ - Features.
+
+    Different IA models selection
+    
+    Drag and drop image 
+    
+    Upscaling x2 one image at a time 
+    
+    Simple and clean GUI
+    
+    Compatible with PNG, JPEG, BMP, WEBP, TIF images
+    
+    Portable everywhere without installation
+
+ - Next steps.
+
+    Batch upscaling (load multiple images)
+
+    Video upscaling
+
+    More AI backends (CUDA / OpenCL / Vulkan)
+
+    GUI-related funcionalities  (Button to stop upscaling, etc.)
+
+    Pre-processing (image/videos downscaling before upscaling)
+
+- Feedback.
+
+    Please, give me feedback about the product, i will listen all feedback.
+
 
 Thank you for your support :)
