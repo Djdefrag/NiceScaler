@@ -58,8 +58,6 @@ Upscaled photo
 
     More AI backends (CUDA / OpenCL / Vulkan)
 
-    GUI-related funcionalities  (Button to stop upscaling, etc.)
-
     Pre-processing (image/videos downscaling before upscaling)
 
 - Feedback.
