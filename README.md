@@ -4,7 +4,7 @@ Lossless image upscaler app based on OpenCV SuperResolution deeplearning models
 
 - Interface.
 
-![GISpXg](https://user-images.githubusercontent.com/32263112/155835469-f437d8b6-c549-4fac-965e-974b37792921.png)
+![Immagine 2022-02-26 123002_FSRCNN_x2_FSRCNN_x2](https://user-images.githubusercontent.com/32263112/155841557-2e7d3c3c-d55b-4313-825e-ac071d24112d.png)
 
 - Example. 
 
@@ -42,9 +42,9 @@ Upscaled photo
 
     Different IA models selection
     
-    Drag and drop image 
+    Drag and drop single image or multiple images (batch upscaling) 
     
-    Upscaling x2 one image at a time 
+    Upscaling x2 
     
     Simple and clean GUI
     
@@ -53,8 +53,6 @@ Upscaled photo
     Portable everywhere without installation
 
  - Next steps.
-
-    Batch upscaling (load multiple images)
 
     Video upscaling
 
