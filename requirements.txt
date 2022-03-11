@@ -1,0 +1,10 @@
+tk-tools
+python-tkdnd
+ttkwidgets
+opencv-python
+opencv-contrib-python
+auto-py-to-exe
+matplotlib
+pywin32
+GPUtil
+numba
