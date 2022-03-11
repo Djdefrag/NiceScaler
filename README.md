@@ -1,10 +1,10 @@
 # NiceScaler
 
-Lossless image upscaler app based on OpenCV SuperResolution deeplearning models
+Lossless image and video upscaler app based on OpenCV deeplearning models
 
 - Interface.
 
-![Immagine 2022-02-26 123002_FSRCNN_x2_FSRCNN_x2](https://user-images.githubusercontent.com/32263112/155841557-2e7d3c3c-d55b-4313-825e-ac071d24112d.png)
+![interface12](https://user-images.githubusercontent.com/32263112/157822890-7ec31eeb-04b1-48e2-bc30-324a95f71956.jpg)
 
 - Example. 
 
@@ -15,7 +15,7 @@ Original photo
 
 Upscaled photo
 
-![7E2yE6](https://user-images.githubusercontent.com/32263112/155835502-1347c958-f919-47ac-b1fd-468acdead24b.png)
+![testx4ddd](https://user-images.githubusercontent.com/32263112/157822217-9742b155-fe63-41a8-b057-81c833719b1d.png)
 
 
  - Credit to.
@@ -36,25 +36,25 @@ Upscaled photo
 
  - Supported IA backends.
 
-    Actually NiceScaler utilize only CPU to upscale to be compatible with any PC, even without powerfull GPU
+    Actually NiceScaler utilize only CPU to upscale to be compatible with any PC, even without powerful GPU
 
  - Features.
+
+    Images and video upscaling
 
     Different IA models selection
     
     Drag and drop single image or multiple images (batch upscaling) 
     
-    Upscaling x2 
+    Upscaling x2 & x4
     
     Simple and clean GUI
     
-    Compatible with PNG, JPEG, BMP, WEBP, TIF images
+    Compatible with PNG, JPEG, BMP, WEBP, TIF images && MP4, WEBM, GIF, MKV, FLV, AVI, MOV videos
     
     Portable everywhere without installation
 
  - Next steps.
-
-    Video upscaling
 
     More AI backends (CUDA / OpenCL / Vulkan)
 
