@@ -1,6 +1,6 @@
 # NiceScaler
 
-Lossless image and video upscaler app based on OpenCV deeplearning models
+NiceScaler - Image/video DeepLearning Upscaler
 
 - Interface.
 
