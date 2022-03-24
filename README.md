@@ -4,7 +4,7 @@ NiceScaler - Image/video DeepLearning Upscaler
 
 - Interface.
 
-![interface12](https://user-images.githubusercontent.com/32263112/157822890-7ec31eeb-04b1-48e2-bc30-324a95f71956.jpg)
+![interface_FSRCNN_x2](https://user-images.githubusercontent.com/32263112/159952266-bc168bc2-2d79-4070-9994-75d15f2e8507.png)
 
 - Example. 
 
@@ -22,8 +22,6 @@ Upscaled photo
 
     OpenCV  (https://opencv.org/)
 
-    EDSR    (https://arxiv.org/pdf/1707.02921.pdf)
-
     ESPCN   (https://arxiv.org/pdf/1609.05158.pdf)
 
     FSRCNN  (https://arxiv.org/pdf/1608.00367.pdf)
@@ -32,11 +30,7 @@ Upscaled photo
 
  - Installation.
 
-    NiceScaler does not require any installation, it's a single portable exe usable on any Windows PC
-
- - Supported IA backends.
-
-    Actually NiceScaler utilize only CPU to upscale to be compatible with any PC, even without powerful GPU
+    NiceScaler does not require installation. It's a single portable exe usable on any Windows PC
 
  - Features.
 
@@ -44,7 +38,9 @@ Upscaled photo
 
     Different IA models selection
     
-    Drag and drop single image or multiple images (batch upscaling) 
+    Cpu & Gpu(OpenCL) backend for AI models
+    
+    Drag and drop single image / multiple images (batch upscaling) / single video
     
     Upscaling x2 & x4
     
@@ -54,11 +50,6 @@ Upscaled photo
     
     Portable everywhere without installation
 
- - Next steps.
-
-    More AI backends (CUDA / OpenCL / Vulkan)
-
-    Pre-processing (image/videos downscaling before upscaling)
 
 - Feedback.
 
