@@ -38,7 +38,7 @@ Upscaled photo
 
     Different IA models selection
     
-    Cpu & Gpu(OpenCL) backend for AI models
+    Cpu & Gpu [OpenCL] backend for AI models
     
     Drag and drop single image / multiple images (batch upscaling) / single video
     
