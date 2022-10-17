@@ -53,7 +53,7 @@ NiceScaler is completely written in Python, from backend to frontend. External p
 
 ## Next steps.
 - [x] New GUI with Windows 11 style
-- [ ] Include audio for upscaled video
+- [x] Include audio for upscaled video
 - [ ] Update libraries 
     - [ ] Python 3.10 (expecting ~10% more performance) 
     - [ ] Python 3.11 (expecting ~30% more performance, now in beta)
