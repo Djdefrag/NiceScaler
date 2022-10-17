@@ -15,7 +15,9 @@ from tkinter import *
 from tkinter import ttk
 
 import cv2
-import moviepy.video.io.ImageSequenceClip
+from moviepy.audio.AudioClip import CompositeAudioClip
+from moviepy.audio.io import AudioFileClip
+from moviepy.video.io import VideoFileClip, ImageSequenceClip
 import tkinterDnD
 from cv2 import dnn_superres
 from win32mica import MICAMODE, ApplyMica
@@ -24,13 +26,19 @@ import sv_ttk
 
 global app_name
 app_name = "NiceScaler"
-version  = "2.3"
+version  = "3.0"
+
+# changed output image from jpg to png boosting quality
+# update libraries for more performance and stability
+# + 50% gpu performance on Windows 11 22H2
+# the app will include audio for videos
+
 
 image_path            = "no file"
 AI_model              = "FSRCNN"
 device                = "GPU"
 input_video_path      = ""
-target_file_extension = '.jpg'
+target_file_extension = '.png'
 windows_subversion    = int(platform.version().split('.')[2])
 upscale_factor        = 2
 tiles_resolution      = 1000
@@ -214,6 +222,11 @@ def extract_frames_from_video(video_path):
         write_in_log_file("Extracted frames " + str(extr_frame) + "/" + str(total_frames))
     cap.release()
 
+    # extract audio from video
+    video = VideoFileClip.VideoFileClip(video_path)
+    audio = video.audio
+    audio.write_audiofile(app_name + "_temp" + os.sep + "audio.mp3")
+
     return video_frames_list
 
 def video_reconstruction_by_frames(input_video_path, video_frames_upscaled_list, AI_model, upscale_factor):
@@ -229,18 +242,24 @@ def video_reconstruction_by_frames(input_video_path, video_frames_upscaled_list,
     for video_type in supported_video_list:
         video_name = video_name.replace(video_type, "")
 
-    # 3) create upscaled video path string
-    upscaled_video_name = (only_path +
-                           video_name +
-                           "_" +
-                           AI_model +
-                           "_x" +
-                           str(upscale_factor) +
-                           ".mp4")
-
     # 4) create upscaled video with upscaled frames
-    clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(video_frames_upscaled_list, fps=frame_rate)
-    clip.write_videofile(upscaled_video_name)
+    temp_video_path = app_name + "_temp" + os.sep + "tempVideo.mp4"
+    clip = ImageSequenceClip.ImageSequenceClip(video_frames_upscaled_list, 
+                                                                fps=frame_rate)
+    clip.write_videofile(temp_video_path)
+
+    # 5) add audio in upscaled video
+    upscaled_video_path = (only_path + video_name + "_" +
+                        AI_model + "_x" + str(upscale_factor) + ".mp4")
+
+    video = VideoFileClip.VideoFileClip(temp_video_path)
+    audio = AudioFileClip.AudioFileClip(app_name + "_temp" + os.sep + "audio.mp3")
+
+    new_audioclip = CompositeAudioClip([audio])
+    video.audio = new_audioclip
+    video.write_videofile(upscaled_video_path)
+
+
 
 def convert_image_list(image_list, target_file_extension):
     converted_images = []
