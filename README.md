@@ -27,6 +27,10 @@ NiceScaler is completely written in Python, from backend to frontend. External p
 - [ ] Miscellaneous -> Pywin32 / Win32mica / Image_slicer
 
 ## Installation.
+#### Prerequisites: 
+ Visual C++: https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/
+ 
+ DirectX runtime: https://www.microsoft.com/en-us/download/details.aspx?id=8109
 1) download the release
 2) execute NiceScaler.exe
 
@@ -60,6 +64,9 @@ NiceScaler is completely written in Python, from backend to frontend. External p
 
 ## Known bugs.
 - [ ] Filenames with non-latin symbols (for example kangy, cyrillic etc.) not supported - [Temp solution] rename files like "image" or "video"
+- [ ] GPU upscaling does not work correctly with some gpus (use cpu instead)
+- [ ] When running QualityScaler as Administrator, drag&drop is not working
+
 
 ## Example. 
 
