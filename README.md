@@ -64,8 +64,8 @@ NiceScaler is completely written in Python, from backend to frontend. External p
 
 ## Known bugs.
 - [ ] Filenames with non-latin symbols (for example kangy, cyrillic etc.) not supported - [Temp solution] rename files like "image" or "video"
-- [ ] GPU upscaling does not work correctly with some gpus (use cpu instead)
-- [ ] When running QualityScaler as Administrator, drag&drop is not working
+- [ ] GPU upscaling does not work correctly with some gpus (use CPU instead)
+- [ ] When running NiceScaler as Administrator, drag&drop is not working
 
 
 ## Example. 
