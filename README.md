@@ -21,18 +21,9 @@ LapSRN  (https://arxiv.org/pdf/1710.01992.pdf)
 ## How is made.
 NiceScaler is completely written in Python, from backend to frontend. External packages are:
 - [ ] AI  -> OpenCV
-- [ ] GUI -> Tkinter / Tkdnd / Sv_ttk
+- [ ] GUI -> Tkinter / Tkdnd / Sv_ttk / Win32mica
 - [ ] Image/video -> OpenCV / Moviepy
 - [ ] Packaging   -> Pyinstaller
-- [ ] Miscellaneous -> Pywin32 / Win32mica / Image_slicer
-
-## Installation.
-#### Prerequisites: 
- Visual C++: https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/
- 
- DirectX runtime: https://www.microsoft.com/en-us/download/details.aspx?id=8109
-1) download the release
-2) execute NiceScaler.exe
 
 ## Requirements
 - [ ] Windows 11 / Windows 10
@@ -63,7 +54,6 @@ NiceScaler is completely written in Python, from backend to frontend. External p
     - [ ] Python 3.11 (expecting ~30% more performance, now in beta)
 
 ## Known bugs.
-- [ ] Filenames with non-latin symbols (for example kangy, cyrillic etc.) not supported - [Temp solution] rename files like "image" or "video"
 - [ ] GPU upscaling does not work correctly with some gpus (use CPU instead)
 - [ ] When running NiceScaler as Administrator, drag&drop is not working
 
