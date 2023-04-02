@@ -1,6 +1,6 @@
 <div align="center">
     <br>
-    <img src="https://github.com/Djdefrag/NiceScaler/blob/main/logo.png" width="175"> </a> 
+    <img src="https://github.com/Djdefrag/NiceScaler/blob/main/Assets/logo.png" width="175"> </a> 
     <br><br> Image/Video Deeplearning Upscaler App for Windows <br><br>
     <a href="https://github.com/Djdefrag/NiceScaler/releases">
          <img src="https://user-images.githubusercontent.com/86362423/162710522-c40c4f39-a6b9-48bc-84bc-1c6b78319f01.png" width="200">
@@ -8,7 +8,7 @@
 </div>
 <br>
 <div align="center">
-    <img src="https://user-images.githubusercontent.com/32263112/185062867-1e725e1d-b0a8-46ed-aa48-fd15041dfb34.png"> </a> 
+    <img src="https://user-images.githubusercontent.com/32263112/229338163-8ee5fdd3-1a42-48b9-904c-35aaded31080.PNG"> </a> 
 </div>
 
 ## Credits.
@@ -28,10 +28,7 @@ NiceScaler is completely written in Python, from backend to frontend. External p
 ## Requirements
 - [ ] Windows 11 / Windows 10
 - [ ] RAM >= 8Gb
-- [ ] Directx12 compatible GPU:
-    - [ ] any AMD >= Radeon HD 7000 series
-    - [ ] any Intel HD Integrated >= 4th-gen core
-    - [ ] any NVIDIA >=  GTX 600 series
+- [ ] OpenCL compatible gpu
 - [ ] CPU
 
 ## Features.
@@ -50,7 +47,7 @@ NiceScaler is completely written in Python, from backend to frontend. External p
 - [x] New GUI with Windows 11 style
 - [x] Include audio for upscaled video
 - [ ] Update libraries 
-    - [ ] Python 3.10 (expecting ~10% more performance) 
+    - [x] Python 3.10 (expecting ~10% more performance) 
     - [ ] Python 3.11 (expecting ~30% more performance, now in beta)
 
 ## Known bugs.
