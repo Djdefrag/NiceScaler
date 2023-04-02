@@ -1,7 +1,7 @@
 <div align="center">
     <br>
     <img src="https://github.com/Djdefrag/NiceScaler/blob/main/Assets/logo.png" width="175"> </a> 
-    <br><br> Image/Video Deeplearning Upscaler App for Windows <br><br>
+    <br><br> Image/Video deeplearning upscaler app for Windows (OpenCV) <br><br>
     <a href="https://github.com/Djdefrag/NiceScaler/releases">
          <img src="https://user-images.githubusercontent.com/86362423/162710522-c40c4f39-a6b9-48bc-84bc-1c6b78319f01.png" width="200">
     </a>
