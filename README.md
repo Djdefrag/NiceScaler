@@ -57,13 +57,9 @@ NiceScaler is completely written in Python, from backend to frontend. External p
 
 ## Example. 
 
-Original photo
+![Original](https://github.com/Djdefrag/NiceScaler/assets/32263112/6aaf2f4c-2a33-415c-94cb-2b60ae60650d)
 
-![rPc+73](https://user-images.githubusercontent.com/32263112/155835499-fef341fb-d727-40f6-841c-5c41a1340499.png)
 
-Upscaled photo
-
-![testx4ddd](https://user-images.githubusercontent.com/32263112/157822217-9742b155-fe63-41a8-b057-81c833719b1d.png)
 
 
  
